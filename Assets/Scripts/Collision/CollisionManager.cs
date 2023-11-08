@@ -15,6 +15,7 @@ public class CollisionManager : MonoBehaviour
 {
     private ESpatialPartitionOption m_option;
     private uint m_collisionCount = 0u;
+    private int m_sphereCount = 1;
 
     private SPGridGeneric<Sphere> _grid;
 
@@ -26,6 +27,7 @@ public class CollisionManager : MonoBehaviour
     private void OnGUI()
     {
         GUILayout.Label("Collisions test : " + m_collisionCount);
+        GUILayout.Label("Collisions per sphere : " + m_collisionCount / (float)m_sphereCount);
     }
 
     private void OnDrawGizmos()
@@ -44,6 +46,7 @@ public class CollisionManager : MonoBehaviour
         m_collisionCount = 0u;
 
         Sphere[] spheres = FindObjectsOfType<Sphere>();
+        m_sphereCount = spheres.Length;
         PlaneCollider[] colliders = FindObjectsOfType<PlaneCollider>();
 
         for(int i = 0; i < spheres.Length; i++)
