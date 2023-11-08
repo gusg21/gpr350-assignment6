@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using SpatialPartition;
 using UnityEngine;
 
 public enum ESpatialPartitionOption
 {
     None = 0,
-    COUNT = 1
+    GRID = 1,
+    COUNT = 2
     // TODO : put your own choice
 };
 
@@ -13,6 +15,8 @@ public class CollisionManager : MonoBehaviour
 {
     private ESpatialPartitionOption m_option;
     private uint m_collisionCount = 0u;
+
+    private SPGridGeneric<Sphere> _grid;
 
     public void CycleSpacePartition()
     {
@@ -26,12 +30,13 @@ public class CollisionManager : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        // TODO : debug draw if you want
+        if (m_option == ESpatialPartitionOption.GRID)
+            _grid.DrawGizmos();
     }
 
     private void Start()
     {
-        // TODO : you can initialize here
+        _grid = new(2, 2);
     }
 
     private void FixedUpdate()
@@ -63,10 +68,22 @@ public class CollisionManager : MonoBehaviour
                 }
             }
         }
-        //else if (m_option == ESpatialPartitionOption.SOMETHING)
+        else if (m_option == ESpatialPartitionOption.GRID)
         {
             // TODO : re-create your spatial partition
             // TODO : query it
+
+            _grid.UpdateBoxes(spheres, s => s.transform.position);
+
+            foreach (var sphereA in spheres)
+            {
+                var neighbors = _grid.GetNeighbors(sphereA.position);
+                foreach (var neighborSphere in neighbors)
+                {
+                    m_collisionCount++;
+                    CollisionDetection.ApplyCollisionResolution(sphereA, neighborSphere);
+                }
+            }
         }
     }
 }
